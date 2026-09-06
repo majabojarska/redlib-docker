@@ -31,7 +31,7 @@ RUN set -xe \
     && apt-get update \
     # Common
     && apt-get install -y --no-install-recommends \
-    wget=1.21.4-1ubuntu4.5 \
+    wget=1.25.0-2ubuntu4.4 \
     # Cleanup
     && apt-get autoremove -y --purge \
     && apt-get -q clean -y && rm -rf /var/lib/apt/lists/* && rm -f /var/cache/apt/*.bin
