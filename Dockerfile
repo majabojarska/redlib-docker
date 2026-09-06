@@ -23,7 +23,7 @@ RUN set -xe \
     && mv target/${TARGET}/release/redlib /app/redlib \
     && chmod +x /app/redlib
 
-FROM ubuntu:noble AS final
+FROM ubuntu:resolute AS final
 
 LABEL org.opencontainers.image.authors="Maja Bojarska <majabojarska98@gmail.com>"
 
