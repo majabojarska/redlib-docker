@@ -40,6 +40,40 @@ jobs:
           tags: |
             type=raw,value=${{ github.ref_name }}
 
+      - name: "Build image for verification"
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          # Load into the local daemon so the healthcheck steps can run it.
+          load: true
+          provenance: false
+          # Dockerfile clones upstream at build time, so never reuse a cached layer.
+          no-cache: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: "Start container"
+        run: docker run -d --rm --name redlib-release -p 8080:8080 ${{ steps.meta.outputs.tags }}
+
+      - name: "Wait for HTTP response"
+        run: |
+          for i in $(seq 1 30); do
+            if wget --spider -q http://localhost:8080/settings; then
+              echo "Container is listening and responding."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container did not respond in time."
+          docker logs redlib-release || true
+          exit 1
+
+      - name: "Stop container"
+        if: always()
+        run: docker stop redlib-release || true
+
       - name: "Build and push release image"
         uses: docker/build-push-action@v7
         with:
@@ -47,7 +81,7 @@ jobs:
           file: ./Dockerfile
           push: true
           provenance: mode=max
-          # Dockerfile clones upstream at build time, so never reuse a cached layer.
-          no-cache: true
+          # No no-cache here: reuses the layers verified above, so this
+          # pushes exactly the image that passed the healthcheck.
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
