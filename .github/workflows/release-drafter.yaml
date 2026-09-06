@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: "Release Drafter"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: write
+
+jobs:
+  update-release-draft:
+    name: "Update release draft"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          # Tags are needed to compute the next CalVer patch number.
+          fetch-tags: true
+
+      - name: "Compute CalVer tag (YYYY.MM.DD.patch)"
+        id: calver
+        run: |
+          DATE_PREFIX="$(date +%Y.%-m.%-d)"
+          LAST_PATCH="$(git tag --list "${DATE_PREFIX}.*" | sed "s/^${DATE_PREFIX}\.//" | grep -E '^[0-9]+$' | sort -n | tail -n 1)"
+          NEXT_PATCH="$(( ${LAST_PATCH:--1} + 1 ))"
+          TAG="${DATE_PREFIX}.${NEXT_PATCH}"
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+          echo "Next release tag: ${TAG}"
+
+      - name: "Update release draft"
+        uses: release-drafter/release-drafter@v6
+        with:
+          name: ${{ steps.calver.outputs.tag }}
+          tag: ${{ steps.calver.outputs.tag }}
+          version: ${{ steps.calver.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

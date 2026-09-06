@@ -1,0 +1,40 @@
+# Configuration for https://github.com/release-drafter/release-drafter.
+# Keeps a draft release updated from merged pull requests.
+# Publishing the draft triggers the Release workflow, which builds
+# and pushes the image tagged with the release tag.
+#
+# Version tags are CalVer (YYYY.MM.DD.patch, e.g. 2026.9.6.0).
+# The tag is computed in the workflow and passed in explicitly,
+# so no version-resolver is configured here.
+
+categories:
+  - title: Breaking Changes
+    labels:
+      - major
+      - breaking
+  - title: Features
+    labels:
+      - minor
+      - feature
+      - enhancement
+  - title: Bug Fixes
+    labels:
+      - patch
+      - fix
+      - bug
+  - title: Maintenance
+    labels:
+      - dependencies
+      - maintenance
+      - chore
+      - docs
+      - ci
+
+exclude-labels:
+  - skip-changelog
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes
+
+  $CHANGES
