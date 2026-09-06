@@ -45,6 +45,11 @@ jobs:
           # Load into the local daemon so the healthcheck steps can run it.
           load: true
           tags: redlib:status-check
+          # Reuse layers (notably the Rust dependency compile) across runs.
+          # Safe against stale upstream code: the redlib commit hash is pinned
+          # in the Dockerfile, so a pin bump invalidates the cache.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: "Start container"
         run: docker run -d --rm --name redlib-status -p 8080:8080 redlib:status-check

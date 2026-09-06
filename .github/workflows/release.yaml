@@ -49,8 +49,13 @@ jobs:
           # Load into the local daemon so the healthcheck steps can run it.
           load: true
           provenance: false
-          # Dockerfile clones upstream at build time, so never reuse a cached layer.
-          no-cache: true
+          # Always pull fresh base images, and reuse cached layers (notably
+          # the Rust dependency compile) across runs. Safe against stale
+          # upstream code: the redlib commit hash is pinned in the Dockerfile,
+          # so a pin bump invalidates the cache.
+          pull: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
