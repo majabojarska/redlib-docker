@@ -39,7 +39,7 @@ jobs:
           echo "Next release tag: ${TAG}"
 
       - name: "Update release draft"
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           name: ${{ steps.calver.outputs.tag }}
           tag: ${{ steps.calver.outputs.tag }}
