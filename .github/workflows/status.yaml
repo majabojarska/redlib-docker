@@ -42,3 +42,26 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+          # Load into the local daemon so the healthcheck steps can run it.
+          load: true
+          tags: redlib:status-check
+
+      - name: "Start container"
+        run: docker run -d --rm --name redlib-status -p 8080:8080 redlib:status-check
+
+      - name: "Wait for HTTP response"
+        run: |
+          for i in $(seq 1 30); do
+            if wget --spider -q http://localhost:8080/settings; then
+              echo "Container is listening and responding."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container did not respond in time."
+          docker logs redlib-status || true
+          exit 1
+
+      - name: "Stop container"
+        if: always()
+        run: docker stop redlib-status || true
