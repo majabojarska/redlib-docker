@@ -41,7 +41,7 @@ jobs:
             type=raw,value=${{ github.ref_name }}
 
       - name: "Build and push release image"
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
