@@ -1,4 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"]
+  "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update redlib source commit hash",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": [
+        "github\\.com/redlib-org/redlib.*\\n\\s*&& git checkout (?<currentDigest>[0-9a-f]{40})"
+      ],
+      "currentValueTemplate": "main",
+      "depNameTemplate": "redlib",
+      "packageNameTemplate": "https://github.com/redlib-org/redlib",
+      "datasourceTemplate": "git-refs"
+    }
+  ]
 }
