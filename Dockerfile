@@ -17,7 +17,7 @@ RUN set -xe \
 
 RUN set -xe \
     && git clone https://github.com/redlib-org/redlib . \
-    && git checkout a4d36e954cf1bd64f209cd8868c5a29edc81b374 \
+    && git checkout ba116c1186f6b0f9d45f0ae50c827e13eb2f5ea2 \
     && RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target ${TARGET} \
     && mkdir /app \
     && mv target/${TARGET}/release/redlib /app/redlib \
